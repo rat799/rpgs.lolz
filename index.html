@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RPG Clicker</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #121212;
+        color: white;
+        overflow: hidden;
+    }
+
+    /* Floating score above RPG */
+    #scoreBox {
+        position: absolute;
+        top: calc(50% - 240px);
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        z-index: 6;
+        pointer-events: none;
+    }
+
+    #scoreBox div {
+        font-size: 22px;
+        margin: 4px 0;
+    }
+
+    /* Right-side upgrades panel */
+    #upgrades {
+        position: fixed;
+        right: 10px;
+        top: 80px;
+        width: 220px;
+        background: rgba(0,0,0,0.7);
+        padding: 10px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 10;
+    }
+
+    #upgrades button {
+        padding: 10px;
+        background: #2d89ff;
+        border: none;
+        color: white;
+        cursor: pointer;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    #upgrades button:disabled {
+        background: #555;
+        cursor: not-allowed;
+    }
+
+    /* RPG */
+    #clickImage {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 350px;
+        cursor: pointer;
+        user-select: none;
+        transition: transform 0.05s ease;
+        z-index: 2;
+    }
+
+    #clickImage:active {
+        transform: translate(-50%, -50%) scale(0.95);
+    }
+
+    /* BIG explosion */
+    .explosion {
+        position: fixed;
+        width: 320px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 5;
+    }
+</style>
+</head>
+<body>
+
+<!-- Score Above RPG -->
+<div id="scoreBox">
+    <div>Score: <span id="score">0</span></div>
+    <div>Per Click: <span id="perClick">1</span></div>
+    <div>Auto / sec: <span id="autoRate">0</span></div>
+</div>
+
+<!-- Upgrades -->
+<div id="upgrades">
+    <button id="clickUpgrade">+1 Per Click (10)</button>
+    <button id="autoUpgrade">+1 Auto/sec (25)</button>
+    <button id="bigClickUpgrade">+5 Per Click (100)</button>
+    <button id="doubleUpgrade">Double Click Power (250)</button>
+    <button id="megaAutoUpgrade">+5 Auto/sec (300)</button>
+</div>
+
+<img src="rpg.png" id="clickImage" alt="RPG">
+
+<script>
+    let score = 0;
+    let perClick = 1;
+    let autoIncome = 0;
+
+    const scoreText = document.getElementById("score");
+    const perClickText = document.getElementById("perClick");
+    const autoRateText = document.getElementById("autoRate");
+
+    const clickImage = document.getElementById("clickImage");
+
+    const clickUpgradeBtn = document.getElementById("clickUpgrade");
+    const autoUpgradeBtn = document.getElementById("autoUpgrade");
+    const bigClickUpgradeBtn = document.getElementById("bigClickUpgrade");
+    const doubleUpgradeBtn = document.getElementById("doubleUpgrade");
+    const megaAutoUpgradeBtn = document.getElementById("megaAutoUpgrade");
+
+    function updateUI() {
+        scoreText.textContent = score;
+        perClickText.textContent = perClick;
+        autoRateText.textContent = autoIncome;
+
+        clickUpgradeBtn.disabled = score < 10;
+        autoUpgradeBtn.disabled = score < 25;
+        bigClickUpgradeBtn.disabled = score < 100;
+        doubleUpgradeBtn.disabled = score < 250;
+        megaAutoUpgradeBtn.disabled = score < 300;
+    }
+
+    function spawnExplosion() {
+        const explosion = document.createElement("img");
+        explosion.src = "explotion.gif";
+        explosion.className = "explosion";
+        document.body.appendChild(explosion);
+
+        setTimeout(() => explosion.remove(), 700);
+    }
+
+    clickImage.onclick = () => {
+        score += perClick;
+        spawnExplosion();
+        updateUI();
+    };
+
+    clickUpgradeBtn.onclick = () => {
+        score -= 10;
+        perClick += 1;
+        updateUI();
+    };
+
+    autoUpgradeBtn.onclick = () => {
+        score -= 25;
+        autoIncome += 1;
+        updateUI();
+    };
+
+    bigClickUpgradeBtn.onclick = () => {
+        score -= 100;
+        perClick += 5;
+        updateUI();
+    };
+
+    doubleUpgradeBtn.onclick = () => {
+        score -= 250;
+        perClick *= 2;
+        updateUI();
+    };
+
+    megaAutoUpgradeBtn.onclick = () => {
+        score -= 300;
+        autoIncome += 5;
+        updateUI();
+    };
+
+    setInterval(() => {
+        score += autoIncome;
+        updateUI();
+    }, 1000);
+
+    updateUI();
+</script>
+
+</body>
+</html>
